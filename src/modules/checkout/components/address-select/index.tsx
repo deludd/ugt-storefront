@@ -13,20 +13,31 @@ type AddressSelectProps = {
   addresses: Address[]
 }
 
+type AddressValues = {
+  first_name: string
+  last_name: string
+  country_code: string
+}
+
 const AddressSelect = ({ addresses }: AddressSelectProps) => {
   const [selected, setSelected] = useState<string | undefined>(undefined)
 
   const { control, setSavedAddress } = useCheckout()
 
   const handleSelect = (id: string) => {
-    const savedAddress = addresses.find((a) => a.id === id)
+    const savedAddress = addresses.find((a) => a.id === id);
 
     if (savedAddress) {
-      setSavedAddress(savedAddress)
+      const addressValues: AddressValues = {
+        first_name: savedAddress.first_name || "",
+        last_name: savedAddress.last_name || "",
+        country_code: savedAddress.country_code || ""
+      };
+      setSavedAddress(addressValues);
     }
 
-    setSelected(id)
-  }
+    setSelected(id);
+  };
 
   const currentShippingAddress = useWatch({
     control,
