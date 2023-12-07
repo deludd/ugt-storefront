@@ -1,66 +1,34 @@
 import { useCheckout } from "@lib/context/checkout-context"
-import { Button, Heading, Text } from "@medusajs/ui"
-import { CheckCircleSolid } from "@medusajs/icons"
+import Button from "@modules/common/components/button"
 import Spinner from "@modules/common/icons/spinner"
-import BillingAddress from "../billing_address"
 import ShippingAddress from "../shipping-address"
-import Divider from "@modules/common/components/divider"
+import { useState } from "react"
 
 const Addresses = () => {
   const {
-    sameAsBilling: { state: checked, toggle: onChange },
-    editAddresses: { state: isOpen, open },
-    editShipping: { close: closeShipping },
-    editPayment: { close: closePayment },
+    editAddresses: { state: isEdit, toggle: setEdit },
     setAddresses,
     handleSubmit,
     cart,
   } = useCheckout()
+  const [isChecked, setIsChecked] = useState(false);
 
-  const handleEdit = () => {
-    open()
-    closeShipping()
-    closePayment()
-  }
-
+  const handleCheckboxChange = () => {
+    setIsChecked(!isChecked);
+  };
   return (
-    <div className="bg-white px-4 small:px-8">
-      <div className="flex flex-row items-center justify-between mb-6">
-        <Heading
-          level="h2"
-          className="flex flex-row text-3xl-regular gap-x-2 items-baseline"
-        >
-          Address
-          {!isOpen && <CheckCircleSolid />}
-        </Heading>
-        {!isOpen && (
-          <Text>
-            <button onClick={handleEdit} className="text-ui-fg-interactive">
-              Edit
-            </button>
-          </Text>
-        )}
+    <div className="bg-white">
+      <div className={"text-xl-semi flex items-center gap-x-4 px-8 pb-6 pt-8"}>
+        <div className="bg-gray-900 w-8 h-8 rounded-full text-white flex justify-center items-center text-sm">
+          1
+        </div>
+        <h2>Shipping address</h2>
       </div>
-      {isOpen ? (
-        <div className="pb-8">
-          <ShippingAddress checked={checked} onChange={onChange} />
-
-          {!checked && (
-            <div>
-              <Heading
-                level="h2"
-                className="text-3xl-regular gap-x-4 pb-6 pt-8"
-              >
-                Billing address
-              </Heading>
-
-              <BillingAddress />
-            </div>
-          )}
-
+      {isEdit ? (
+        <div className="px-8 pb-8">
+          <ShippingAddress checked={isChecked} onChange={handleCheckboxChange} />
           <Button
-            size="large"
-            className="mt-6"
+            className="max-w-[200px] mt-6"
             onClick={handleSubmit(setAddresses)}
           >
             Continue to delivery
@@ -68,71 +36,25 @@ const Addresses = () => {
         </div>
       ) : (
         <div>
-          <div className="text-small-regular">
+          <div className="bg-gray-50 px-8 py-6 text-small-regular">
             {cart && cart.shipping_address ? (
               <div className="flex items-start gap-x-8">
-                <div className="flex items-start gap-x-1 w-full">
-                  <div className="flex flex-col w-1/3">
-                    <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                      Shipping Address
-                    </Text>
-                    <Text className="txt-medium text-ui-fg-subtle">
+                <div className="bg-green-400 rounded-full min-w-[24px] h-6 flex items-center justify-center text-white text-small-regular">
+                  ✓
+                </div>
+                <div className="flex items-start justify-between w-full">
+                  <div className="flex flex-col">
+                    <span>
                       {cart.shipping_address.first_name}{" "}
                       {cart.shipping_address.last_name}
-                    </Text>
-                    <Text className="txt-medium text-ui-fg-subtle">
-                      {cart.shipping_address.address_1}{" "}
-                      {cart.shipping_address.address_2}
-                    </Text>
-                    <Text className="txt-medium text-ui-fg-subtle">
-                      {cart.shipping_address.postal_code},{" "}
-                      {cart.shipping_address.city}
-                    </Text>
-                    <Text className="txt-medium text-ui-fg-subtle">
-                      {cart.shipping_address.country_code?.toUpperCase()}
-                    </Text>
+                      {cart.shipping_address.country}
+                    </span>
+                    <div className="mt-4 flex flex-col">
+                      <span>{cart.email}</span>
+                    </div>
                   </div>
-
-                  <div className="flex flex-col w-1/3 ">
-                    <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                      Contact
-                    </Text>
-                    <Text className="txt-medium text-ui-fg-subtle">
-                      {cart.shipping_address.phone}
-                    </Text>
-                    <Text className="txt-medium text-ui-fg-subtle">
-                      {cart.email}
-                    </Text>
-                  </div>
-
-                  <div className="flex flex-col w-1/3">
-                    <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                      Billing Address
-                    </Text>
-
-                    {checked ? (
-                      <Text className="txt-medium text-ui-fg-subtle">
-                        Billing- and delivery address are the same.
-                      </Text>
-                    ) : (
-                      <>
-                        <Text className="txt-medium text-ui-fg-subtle">
-                          {cart.billing_address.first_name}{" "}
-                          {cart.billing_address.last_name}
-                        </Text>
-                        <Text className="txt-medium text-ui-fg-subtle">
-                          {cart.billing_address.address_1}{" "}
-                          {cart.billing_address.address_2}
-                        </Text>
-                        <Text className="txt-medium text-ui-fg-subtle">
-                          {cart.billing_address.postal_code},{" "}
-                          {cart.billing_address.city}
-                        </Text>
-                        <Text className="txt-medium text-ui-fg-subtle">
-                          {cart.billing_address.country_code?.toUpperCase()}
-                        </Text>
-                      </>
-                    )}
+                  <div>
+                    <button onClick={setEdit}>Edit</button>
                   </div>
                 </div>
               </div>
@@ -144,7 +66,6 @@ const Addresses = () => {
           </div>
         </div>
       )}
-      <Divider className="mt-8" />
     </div>
   )
 }
